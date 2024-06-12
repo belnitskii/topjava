@@ -23,17 +23,10 @@
         <th>Calories</th>
     </tr>
     <c:forEach var="meal" items="${mealsTo}">
-        <tr>
-            <c:if test="${meal.excess}">
-                <td><p style="color:red;">${f:formatLocalDateTime(meal.dateTime, 'dd.MM.yyyy')}</p></td>
-                <td><p style="color:red;">${meal.description}</p></td>
-                <td><p style="color:red;">${meal.calories}</p></td>
-            </c:if>
-            <c:if test="${!meal.excess}">
-                <td><p style="color:green;">${f:formatLocalDateTime(meal.dateTime, 'dd.MM.yyyy')}</p></td>
-                <td><p style="color:green;">${meal.description}</p></td>
-                <td><p style="color:green;">${meal.calories}</p></td>
-            </c:if>
+        <tr style="color: ${meal.excess ? 'red' : 'green'}" >
+            <td>${f:formatLocalDateTime(meal.dateTime)}</td>
+            <td>${meal.description}</td>
+            <td>${meal.calories}</td>
         </tr>
     </c:forEach>
 </table>

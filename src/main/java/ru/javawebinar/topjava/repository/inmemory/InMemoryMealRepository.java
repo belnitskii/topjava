@@ -9,23 +9,20 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepository.class);
-    private LinkedHashMap<Integer, Meal> repository = new LinkedHashMap<>();
+    private final Map<Integer, Meal> repository = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
         for (Meal meal : MealsUtil.meals) {
             save(meal, SecurityUtil.authUserId());
         }
-        repository = repository.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.comparing(Meal::getDate).reversed()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
     }
 
     @Override
@@ -39,16 +36,40 @@ public class InMemoryMealRepository implements MealRepository {
         return meal.getUserId() == userId ? repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal) : null;
     }
 
+//    @Override
+//    public Meal save(Meal meal, int userId) {
+//        log.info("save {}", meal);
+//        if (repository.containsKey(meal.getId()) && repository.get(meal.getId()).getUserId() == userId){
+//            return repository.put(meal.getId(), meal);
+//        }
+//        if (meal.isNew()) {
+//            meal.setId(counter.incrementAndGet());
+//            if (repository.containsKey(meal.getId())) {
+//                return null;
+//            }
+//            repository.put(meal.getId(), meal);
+//            return meal;
+//        }
+//
+//        return null;
+//    }
+
     @Override
     public boolean delete(int id, int userId) {
         log.info("delete {}", id);
-        return repository.get(id).getUserId() == userId && repository.remove(id) != null;
+        if (repository.containsKey(id)) {
+            return repository.get(id).getUserId() == userId && repository.remove(id) != null;
+        }
+        return false;
     }
 
     @Override
     public Meal get(int id, int userId) {
         log.info("get {}", id);
-        return repository.get(id).getUserId() == userId ? repository.get(id) : null;
+        if (repository.containsKey(id)) {
+            return repository.get(id).getUserId() == userId ? repository.get(id) : null;
+        }
+        return null;
     }
 
     @Override
@@ -56,6 +77,7 @@ public class InMemoryMealRepository implements MealRepository {
         log.info("getAll");
         return repository.values().stream()
                 .filter(meal -> meal.getUserId() == userId)
+                .sorted(Comparator.comparing(Meal::getDate).reversed())
                 .collect(Collectors.toList());
     }
 }

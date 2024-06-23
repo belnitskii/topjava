@@ -20,8 +20,14 @@ public class SpringMain {
         try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml")) {
             System.out.println("Bean definition names: " + Arrays.toString(appCtx.getBeanDefinitionNames()));
             MealRestController mealController = appCtx.getBean(MealRestController.class);
-            mealController.create(new Meal(SecurityUtil.authUserId(), LocalDateTime.now(), "dinner", SecurityUtil.authUserCaloriesPerDay()));
-            System.out.println(mealController.getAll(LocalDate.of(2020, 1, 30), LocalTime.of(9, 0), LocalDate.of(2020, 1, 30), LocalTime.of(11, 0)));
+            mealController.create(new Meal(LocalDateTime.now(), "dinner", SecurityUtil.authUserCaloriesPerDay()));
+//            System.out.println(mealController.getAll());
+            System.out.println("test");
+
+            mealController.create(new Meal(LocalDateTime.now(), "dinner", SecurityUtil.authUserCaloriesPerDay()));
+
+            System.out.println("kek");
+            System.out.println(mealController.getAllFiltered(LocalDate.of(2020, 1, 30), LocalTime.of(9, 0), LocalDate.of(2020, 1, 30), LocalTime.of(11, 0)));
         }
 
         try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml")) {

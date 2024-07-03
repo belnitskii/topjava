@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/64526bbce337474d881e8482e5f3acf5)](https://app.codacy.com/gh/belnitskii/topjava?utm_source=github.com&utm_medium=referral&utm_content=belnitskii/topjava&utm_campaign=Badge_Grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/2072dc0a8ccd479ab216f2418ce6e759)](https://app.codacy.com/gh/belnitskii/topjava/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [Java Enterprise Online Project](https://javaops.ru/view/topjava)
 ===============================

@@ -23,7 +23,6 @@ public class UserService {
     public UserService(UserRepository repository) {
         this.repository = repository;
     }
-
     @CacheEvict(value = "users", allEntries = true)
     public User create(User user) {
         Assert.notNull(user, "user must not be null");

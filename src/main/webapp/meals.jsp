@@ -1,5 +1,4 @@
-<%@ page import="ru.javawebinar.topjava.model.MealTo" %>
-<%@ page import="java.util.List" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html lang="ru">
 <head>
@@ -15,20 +14,15 @@
         <th>Description</th>
         <th>Calories</th>
     </tr>
-    <%
-        List<MealTo> meals = (List<MealTo>) request.getAttribute("meals");
-        for (MealTo meal : meals) {
-    %>
-    <tr>
-        <td><%=meal.getDateTime().toString().replaceAll("T", " ")%></td>
-        <td><%=meal.getDescription()%></td>
-        <%if (meal.isExcess()) { %>
-            <td><span style="color: red"><%=meal.getCalories()%></span></td>
-        <%} else {%>
-            <td><span style="color: green"><%=meal.getCalories()%></span></td>
-        <%}%>
-    </tr>
-    <%}%>
+    <%--@elvariable id="meals" type="java.util.List<ru.javawebinar.topjava.model.MealTo>"--%>
+    <c:forEach items="${meals}" var="meal">
+        <%--@elvariable id="meal" type="ru.javawebinar.topjava.model.MealTo"--%>
+        <tr>
+            <td>${meal.dateTime.toString().replaceAll("T", " ")}</td>
+            <td>${meal.description}</td>
+            <td style="color: ${meal.excess ? 'red' : 'green'}">${meal.calories}</td>
+        </tr>
+    </c:forEach>
 </table>
 </body>
 </html>

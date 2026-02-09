@@ -3,12 +3,15 @@ package ru.javawebinar.topjava.storage;
 import ru.javawebinar.topjava.exception.ExistStorageException;
 import ru.javawebinar.topjava.exception.NotExistStorageException;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.util.MealsUtil;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class MealArrayListStorage implements MealStorage {
-    protected final List<Meal> storage = new ArrayList<>();
+    public static final List<Meal> storage = new CopyOnWriteArrayList<>(MealsUtil.meals);
 
     @Override
     public void clear() {
@@ -41,7 +44,7 @@ public class MealArrayListStorage implements MealStorage {
 
     @Override
     public List<Meal> getAll() {
-        return new ArrayList<>(storage);
+        return storage.stream().sorted(Comparator.comparing(Meal::getDateTime)).collect(Collectors.toList());
     }
 
     @Override

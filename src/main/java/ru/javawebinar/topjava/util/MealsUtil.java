@@ -25,11 +25,6 @@ public class MealsUtil {
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
     );
 
-    public static void main(String[] args) {
-        List<MealTo> mealsTo = filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), CALORIES_PER_DAY);
-        mealsTo.forEach(System.out::println);
-    }
-
     public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(
@@ -49,11 +44,5 @@ public class MealsUtil {
 
     public static List<MealTo> filteredByStreams(List<Meal> meals, int caloriesPerDay) {
         return filteredByStreams(meals, LocalTime.MIN, LocalTime.MAX, caloriesPerDay);
-    }
-
-    public static MealTo filteredByStreamsAndId(List<Meal> meals, int caloriesPerDay, int id) {
-        return filteredByStreams(meals, caloriesPerDay)
-                .stream().filter(m -> m.getId().equals(id))
-                .findFirst().orElse(null);
     }
 }

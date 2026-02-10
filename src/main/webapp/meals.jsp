@@ -4,13 +4,23 @@
 <head>
     <title>Meals</title>
     <style>
-        excess {
-            color: blue;
+        .excess td {
+            color: red;
         }
 
-        normal {
-            color: green
+        .normal td {
+            color: green;
         }
+
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -18,7 +28,7 @@
 <hr>
 <h2>Meals</h2>
 <a href="meals?action=insert">Add new</a>
-<table border="1">
+<table>
     <tr>
         <th>DateTime</th>
         <th>Description</th>
@@ -28,12 +38,11 @@
     </tr>
     <%--@elvariable id="meals" type="java.util.List<ru.javawebinar.topjava.model.MealTo>"--%>
     <c:forEach items="${meals}" var="meal">
-        <c:set var="style" value="color: ${meal.excess ? 'red' : 'green'}"/>
         <%--@elvariable id="meal" type="ru.javawebinar.topjava.model.MealTo"--%>
         <tr class="${meal.excess ? 'excess' : 'normal'}">
-            <td style="${style}">${meal.dateTime.toString().replaceAll("T", " ")}</td>
-            <td style="${style}">${meal.description}</td>
-            <td style="${style}">${meal.calories}</td>
+            <td>${meal.dateTime.toString().replaceAll("T", " ")}</td>
+            <td>${meal.description}</td>
+            <td>${meal.calories}</td>
             <td><a href="meals?action=edit&id=<c:out value="${meal.id}"/>">Update</a></td>
             <td><a href="meals?action=delete&id=<c:out value="${meal.id}"/>">Delete</a></td>
         </tr>

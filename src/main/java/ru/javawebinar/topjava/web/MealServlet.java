@@ -2,89 +2,78 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.MealTo;
-import ru.javawebinar.topjava.storage.MealArrayListStorage;
+import ru.javawebinar.topjava.storage.InMemoryMealRepository;
+import ru.javawebinar.topjava.storage.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
 
-    private static final MealArrayListStorage mealArrayListStorage = new MealArrayListStorage();
+    private static final String MEAL_SERVLET = "meals";
     private static final String INSERT_OR_EDIT = "/meal.jsp";
     private static final String LIST_MEALS = "/meals.jsp";
 
+    private MealRepository mealRepository;
+
+    @Override
+    public void init() {
+        mealRepository = new InMemoryMealRepository();
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String forward = "";
+        String id = req.getParameter("id");
         String action = req.getParameter("action");
-
-        if (action.equalsIgnoreCase("meals")) {
-            forward = LIST_MEALS;
-            log.debug("redirect to {}", forward);
-            List<MealTo> meals = MealsUtil.filteredByStreams(mealArrayListStorage.getAll(), MealsUtil.CALORIES_PER_DAY);
-            req.setAttribute("meals", meals);
-            req.getRequestDispatcher(forward).forward(req, resp);
+        if (action == null) {
+            action = "default";
         }
-        if (action.equalsIgnoreCase("delete")) {
-            forward = LIST_MEALS;
-            String id = req.getParameter("id");
-            log.debug("try to delete meal {}", id);
-            mealArrayListStorage.delete(Integer.parseInt(id));
-            List<MealTo> meals = MealsUtil.filteredByStreams(mealArrayListStorage.getAll(), MealsUtil.CALORIES_PER_DAY);
-            req.setAttribute("meals", meals);
-            log.debug("redirect to {}", forward);
-            req.getRequestDispatcher(forward).forward(req, resp);
-        }
-        if (action.equalsIgnoreCase("edit")) {
-            forward = INSERT_OR_EDIT;
-            int id = Integer.parseInt(req.getParameter("id"));
-            log.debug("try to edit meal {}", id);
-            req.setAttribute("meal", MealsUtil.filteredByStreamsAndId(mealArrayListStorage.getAll(), MealsUtil.CALORIES_PER_DAY, id));
-            log.debug("redirect to {}", forward);
-            req.getRequestDispatcher(forward).forward(req, resp);
-        }
-        if (action.equalsIgnoreCase("insert")) {
-            log.debug("try to add new meal");
-            forward = INSERT_OR_EDIT;
-            log.debug("redirect to {}", forward);
-            req.getRequestDispatcher(forward).forward(req, resp);
+        switch (action) {
+            case "delete":
+                mealRepository.delete(Integer.parseInt(id));
+                log.debug("Try to delete meal with id:{}, redirect to {}", id, MEAL_SERVLET);
+                resp.sendRedirect(MEAL_SERVLET);
+                break;
+            case "edit":
+                req.setAttribute("meal", mealRepository.get(Integer.parseInt(req.getParameter("id"))));
+                log.debug("Try to edit meal with id:{}, redirect to {}", id, INSERT_OR_EDIT);
+                req.getRequestDispatcher(INSERT_OR_EDIT).forward(req, resp);
+                break;
+            case "insert":
+                log.debug("Try to add new meal, redirect to {}", INSERT_OR_EDIT);
+                req.getRequestDispatcher(INSERT_OR_EDIT).forward(req, resp);
+                break;
+            default:
+                req.setAttribute("meals", MealsUtil.filteredByStreams(mealRepository.getAll(), MealsUtil.CALORIES_PER_DAY));
+                log.debug("Redirect to {}", LIST_MEALS);
+                req.getRequestDispatcher(LIST_MEALS).forward(req, resp);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String forward = LIST_MEALS;
         req.setCharacterEncoding("UTF-8");
         String idParam = req.getParameter("id");
         LocalDateTime localDateTime = LocalDateTime.parse((req.getParameter("datetime")));
         String description = String.valueOf(req.getParameter("description"));
         int calories = Integer.parseInt(req.getParameter("calories"));
-        Meal meal;
         if (idParam == null || idParam.isEmpty()) {
-            log.debug("try to save new meal");
-            meal = new Meal(localDateTime, description, calories);
-            mealArrayListStorage.save(meal);
+            log.debug("Try to save new meal");
+            mealRepository.save(new Meal(localDateTime, description, calories));
         } else {
             int id = Integer.parseInt(idParam);
-            meal = new Meal(id, localDateTime, description, calories);
-            log.debug("try to update meal {}", id);
-            mealArrayListStorage.update(meal);
+            log.debug("Try to update meal {}", id);
+            mealRepository.save(new Meal(id, localDateTime, description, calories));
         }
-        RequestDispatcher view = req.getRequestDispatcher(forward);
-        List<MealTo> meals = MealsUtil.filteredByStreams(mealArrayListStorage.getAll(), MealsUtil.CALORIES_PER_DAY);
-        req.setAttribute("meals", meals);
-        log.debug("redirect to {}", forward);
-        view.forward(req, resp);
+        log.debug("Meal was saved or updated, redirect to {}", MEAL_SERVLET);
+        resp.sendRedirect(MEAL_SERVLET);
     }
 }

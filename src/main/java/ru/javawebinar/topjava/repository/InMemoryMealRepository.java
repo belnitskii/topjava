@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.storage;
+package ru.javawebinar.topjava.repository;
 
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.MealsUtil;
@@ -18,11 +18,11 @@ public class InMemoryMealRepository implements MealRepository {
         MealsUtil.meals.forEach(this::save);
     }
 
-    public void clear() {
+    protected void clear() {
         storage.clear();
     }
 
-    public int size() {
+    protected int size() {
         return storage.size();
     }
 
@@ -30,8 +30,10 @@ public class InMemoryMealRepository implements MealRepository {
     public Meal save(Meal meal) {
         if (meal.getId() == null) {
             meal.setId(counter.getAndIncrement());
+            storage.put(meal.getId(), meal);
+            return meal;
         }
-        return storage.put(meal.getId(), meal);
+        return storage.computeIfPresent(meal.getId(), (id, oldValue) -> meal);
     }
 
     @Override
@@ -40,12 +42,12 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public Meal delete(int id) {
-        return storage.remove(id);
+    public boolean delete(int id) {
+        return storage.remove(id) != null;
     }
 
     @Override
     public List<Meal> getAll() {
-        return storage.values().stream().sorted(Comparator.comparing(Meal::getDate)).collect(Collectors.toList());
+        return storage.values().stream().sorted(Comparator.comparing(Meal::getDateTime).reversed()).collect(Collectors.toList());
     }
 }

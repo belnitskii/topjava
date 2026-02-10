@@ -2,8 +2,8 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.storage.InMemoryMealRepository;
-import ru.javawebinar.topjava.storage.MealRepository;
+import ru.javawebinar.topjava.repository.InMemoryMealRepository;
+import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletException;
@@ -31,20 +31,21 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String id = req.getParameter("id");
         String action = req.getParameter("action");
         if (action == null) {
             action = "default";
         }
         switch (action) {
             case "delete":
-                mealRepository.delete(Integer.parseInt(id));
-                log.debug("Try to delete meal with id:{}, redirect to {}", id, MEAL_SERVLET);
+                int deleteId = Integer.parseInt(req.getParameter("id"));
+                mealRepository.delete(deleteId);
+                log.debug("Try to delete meal with id:{}, redirect to {}", deleteId, MEAL_SERVLET);
                 resp.sendRedirect(MEAL_SERVLET);
                 break;
             case "edit":
-                req.setAttribute("meal", mealRepository.get(Integer.parseInt(req.getParameter("id"))));
-                log.debug("Try to edit meal with id:{}, redirect to {}", id, INSERT_OR_EDIT);
+                int editId = Integer.parseInt(req.getParameter("id"));
+                req.setAttribute("meal", mealRepository.get(editId));
+                log.debug("Try to edit meal with id:{}, redirect to {}", editId, INSERT_OR_EDIT);
                 req.getRequestDispatcher(INSERT_OR_EDIT).forward(req, resp);
                 break;
             case "insert":

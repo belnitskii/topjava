@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.repository.inmemory;
 
+import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+@Repository
 public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, Meal> mealsMap = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
@@ -25,32 +27,27 @@ public class InMemoryMealRepository implements MealRepository {
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
             meal.setUserId(userId);
-            mealsMap.put(meal.getId(), meal);
+            mealsMap.putIfAbsent(meal.getId(), meal);
             return meal;
         }
-        Meal oldMeal = mealsMap.get(meal.getId());
-        if (oldMeal != null && oldMeal.getUserId() == userId) {
-            mealsMap.replace(meal.getId(), meal);
-        }
-        return null;
+        return mealsMap.computeIfPresent(meal.getId(), (k, v) -> {
+            if (v.getUserId() == userId) {
+                return meal;
+            }
+            return v;
+        }) == meal ? meal : null;
     }
 
     @Override
     public boolean delete(int id, int userId) {
         Meal meal = mealsMap.get(id);
-        if (meal != null && meal.getUserId() == userId) {
-            return mealsMap.remove(id) != null;
-        }
-        return false;
+        return meal != null && meal.getUserId() == userId && mealsMap.remove(id, meal);
     }
 
     @Override
     public Meal get(int id, int userId) {
         Meal meal = mealsMap.get(id);
-        if (meal != null && meal.getUserId() == userId) {
-            return meal;
-        }
-        return null;
+        return (meal != null && meal.getUserId() == userId) ? meal : null;
     }
 
     @Override

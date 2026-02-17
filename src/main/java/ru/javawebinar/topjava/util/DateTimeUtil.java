@@ -13,14 +13,6 @@ public class DateTimeUtil {
       return !lt.isBefore(start) && lt.isBefore(end);
     }
 
-    public static boolean isBetweenHalfOpen(LocalTime lt, LocalTime startTime, LocalTime endTime) {
-        return !lt.isBefore(startTime) && lt.isBefore(endTime);
-    }
-
-    public static boolean isBetweenHalfOpen(LocalDateTime lt, LocalDate startDate, LocalDate endDate) {
-        return !lt.toLocalDate().isBefore(startDate) && lt.toLocalDate().isBefore(endDate);
-    }
-
     public static String toString(LocalDateTime ldt) {
         return ldt == null ? "" : ldt.format(DATE_TIME_FORMATTER);
     }

@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import static ru.javawebinar.topjava.util.DateTimeUtil.*;
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkIsNew;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
@@ -36,7 +37,11 @@ public class MealRestController {
 
     public List<MealTo> getAllFiltered(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
         log.info("getAllFiltered");
-        return MealsUtil.getFilteredTos(service.getAll(authUserId()), authUserCaloriesPerDay(), startDate, startTime, endDate, endTime);
+        return MealsUtil.getFilteredTos(service.getAll(authUserId()), authUserCaloriesPerDay(),
+                parseStartLocalDate(startDate),
+                parseStartLocalTime(startTime),
+                parseEndLocalDate(endDate),
+                parseEndLocalTime(endTime));
     }
 
     public Meal get(int id) {

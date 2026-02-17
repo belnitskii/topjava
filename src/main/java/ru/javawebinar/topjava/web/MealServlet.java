@@ -12,13 +12,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-import static ru.javawebinar.topjava.util.DateTimeUtil.*;
+import static ru.javawebinar.topjava.util.DateTimeUtil.parseServletLocalDate;
+import static ru.javawebinar.topjava.util.DateTimeUtil.parseServletLocalTime;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 public class MealServlet extends HttpServlet {
@@ -42,18 +41,21 @@ public class MealServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
         String id = request.getParameter("id");
-
-        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
-                authUserId(),
-                LocalDateTime.parse(request.getParameter("dateTime")),
-                request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")));
-
-        log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-        if (meal.isNew()) {
+        if (id.isEmpty()) {
+            Meal meal = new Meal(
+                    LocalDateTime.parse(request.getParameter("dateTime")),
+                    request.getParameter("description"),
+                    Integer.parseInt(request.getParameter("calories")));
+            log.info("Create {}", meal);
             mealRestController.create(meal);
         } else {
-            mealRestController.update(meal, meal.getId());
+            Meal mealUpdate = new Meal(Integer.valueOf(id),
+                    LocalDateTime.parse(request.getParameter("dateTime")),
+                    request.getParameter("description"),
+                    Integer.parseInt(request.getParameter("calories")),
+                    authUserId());
+            log.info("Update {}", mealUpdate);
+            mealRestController.update(mealUpdate, mealUpdate.getId());
         }
         response.sendRedirect("meals");
     }
@@ -78,12 +80,12 @@ public class MealServlet extends HttpServlet {
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
             case "filter":
-                LocalDate startDate = parseStartLocalDate(request.getParameter("startDate"));
-                LocalTime startTime = parseStartLocalTime(request.getParameter("startTime"));
-                LocalDate endDate = parseEndLocalDate(request.getParameter("endDate"));
-                LocalTime endTime = parseEndLocalTime(request.getParameter("endTime"));
                 log.info("getAllFiltered");
-                request.setAttribute("meals", mealRestController.getAllFiltered(startDate, startTime, endDate, endTime));
+                request.setAttribute("meals", mealRestController.getAllFiltered(
+                        parseServletLocalDate(request.getParameter("startDate")),
+                        parseServletLocalTime(request.getParameter("startTime")),
+                        parseServletLocalDate(request.getParameter("endDate")),
+                        parseServletLocalTime(request.getParameter("endTime"))));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
             case "all":

@@ -15,7 +15,16 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        log.debug("forward to users");
-        request.getRequestDispatcher("/users.jsp").forward(request, response);
+        String parameter = request.getParameter("id");
+        if (parameter != null && !parameter.isEmpty() ) {
+            int id = Integer.parseInt(parameter);
+            log.info("Set user {}", id);
+            SecurityUtil.setAuthUserId(id);
+            log.info("forward to meal");
+            response.sendRedirect("meals");
+        } else {
+            log.debug("forward to users");
+            request.getRequestDispatcher("/users.jsp").forward(request, response);
+        }
     }
 }

@@ -7,7 +7,8 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 import ru.javawebinar.topjava.web.user.AdminRestController;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 
 public class SpringMain {
@@ -18,7 +19,7 @@ public class SpringMain {
             AdminRestController adminUserController = appCtx.getBean(AdminRestController.class);
             adminUserController.create(new User(null, "userName", "email@mail.ru", "password", Role.ADMIN));
             MealRestController mealRestController = appCtx.getBean(MealRestController.class);
-            System.out.println(mealRestController.getAllFiltered(LocalDateTime.of(2020, 1, 30, 12, 0), LocalDateTime.MAX));
+            System.out.println(mealRestController.getAllFiltered(LocalDate.of(2020, 1, 30), LocalTime.of(3, 0), LocalDate.of(2025, 1, 30), LocalTime.of(12, 0)));
         }
     }
 }

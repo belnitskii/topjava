@@ -7,17 +7,17 @@ import java.time.format.DateTimeFormatter;
 
 public class DateTimeUtil {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    public static boolean isBetweenHalfOpen(LocalDateTime lt, LocalDate startDate,LocalTime startTime, LocalDate endDate, LocalTime endTime) {
+    public static boolean filterDateTime(LocalDateTime lt, LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
       return isBetweenClosedInterval(lt.toLocalDate(), startDate, endDate)
               && isBetweenHalfOpen(lt.toLocalTime(), startTime, endTime);
     }
 
-    public static boolean isBetweenClosedInterval(LocalDate lt, LocalDate startDate, LocalDate endDate) {
-        return !lt.isBefore(startDate) && !lt.isAfter(endDate);
+    public static <T extends Comparable<? super T>> boolean isBetweenClosedInterval(T lt, T start, T end) {
+        return lt.compareTo(start) >= 0 && lt.compareTo(end) <= 0;
     }
 
-    public static boolean isBetweenHalfOpen(LocalTime lt, LocalTime startTime, LocalTime endTime) {
-        return !lt.isBefore(startTime) && lt.isBefore(endTime);
+    public static <T extends Comparable<? super T>> boolean isBetweenHalfOpen(T lt, T start, T end) {
+        return lt.compareTo(start) >= 0 && lt.compareTo(end) < 0;
     }
 
     public static String toString(LocalDateTime ldt) {

@@ -37,11 +37,12 @@ public class MealRestController {
 
     public List<MealTo> getAllFiltered(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
         log.info("getAllFiltered");
-        return MealsUtil.getFilteredTos(service.getAll(authUserId()), authUserCaloriesPerDay(),
-                parseStartLocalDate(startDate),
+        return MealsUtil.getFilteredTos(
+                service.getAllFilteredByDate(authUserId(), parseStartLocalDate(startDate), parseEndLocalDate(endDate)),
+                authUserCaloriesPerDay(),
                 parseStartLocalTime(startTime),
-                parseEndLocalDate(endDate),
-                parseEndLocalTime(endTime));
+                parseEndLocalTime(endTime)
+        );
     }
 
     public Meal get(int id) {

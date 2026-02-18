@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Repository
@@ -40,12 +41,7 @@ public class InMemoryMealRepository implements MealRepository {
             return meal;
         }
         log.info("update {}", meal);
-        return meals.computeIfPresent(meal.getId(), (k, v) -> {
-            if (v.getUserId() == userId) {
-                return meal;
-            }
-            return v;
-        }) == meal ? meal : null;
+        return meals.computeIfPresent(meal.getId(), (k, v) -> v) == meal ? meal : null;
     }
 
     @Override
@@ -56,7 +52,7 @@ public class InMemoryMealRepository implements MealRepository {
         }
         Meal meal = meals.get(id);
         log.info("delete {}", id);
-        return meal != null && meal.getUserId() == userId && meals.remove(id, meal);
+        return meal != null && meals.remove(id, meal);
     }
 
     @Override
@@ -65,32 +61,28 @@ public class InMemoryMealRepository implements MealRepository {
         if (meals == null) {
             return null;
         }
-        Meal meal = meals.get(id);
         log.info("get {}", id);
-        return (meal != null && meal.getUserId() == userId) ? meal : null;
+        return meals.get(id);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        Map<Integer, Meal> meals = userMealsMap.get(userId);
-        if (meals == null) {
-            return Collections.emptyList();
-        }
         log.info("getAll for user {}", userId);
-        return meals.values().stream()
-                .sorted(Comparator.comparing(Meal::getDateTime).reversed()).collect(Collectors.toList());
+        return filterByPredicate(userMealsMap.get(userId), meal -> true);
     }
 
     @Override
     public List<Meal> getAllFilteredByDate(int userId, LocalDate startDate, LocalDate endDate) {
-        Map<Integer, Meal> meals = userMealsMap.get(userId);
+        log.info("getAllFiltered for user {}, start date: {}, end date: {} ", userId, startDate, endDate);
+        return filterByPredicate(userMealsMap.get(userId), meal -> DateTimeUtil.isBetweenClosedInterval(meal.getDate(), startDate, endDate));
+    }
+
+    private List<Meal> filterByPredicate(Map<Integer, Meal> meals, Predicate<Meal> filter) {
         if (meals == null) {
             return Collections.emptyList();
         }
-        log.info("getAllFiltered for user {}", userId);
-        return meals.values().stream()
-                .filter(m -> DateTimeUtil.isBetweenClosedInterval(m.getDateTime().toLocalDate(), startDate, endDate))
-                .sorted(Comparator.comparing(Meal::getDateTime).reversed()).collect(Collectors.toList());
+        return meals.values().stream().filter(filter).
+                sorted(Comparator.comparing(Meal::getDateTime).reversed()).collect(Collectors.toList());
     }
 }
 

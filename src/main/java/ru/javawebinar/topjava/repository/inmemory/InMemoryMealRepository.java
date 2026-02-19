@@ -35,34 +35,26 @@ public class InMemoryMealRepository implements MealRepository {
         Map<Integer, Meal> meals = userMealsMap.computeIfAbsent(userId, mealsMap -> new ConcurrentHashMap<>());
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            meal.setUserId(userId);
             log.info("save {}", meal);
             meals.put(meal.getId(), meal);
             return meal;
         }
         log.info("update {}", meal);
-        return meals.computeIfPresent(meal.getId(), (k, v) -> v) == meal ? meal : null;
+        return meals.computeIfPresent(meal.getId(), (k, v) -> meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
         Map<Integer, Meal> meals = userMealsMap.get(userId);
-        if (meals == null) {
-            return false;
-        }
-        Meal meal = meals.get(id);
         log.info("delete {}", id);
-        return meal != null && meals.remove(id, meal);
+        return meals != null && meals.remove(id) != null;
     }
 
     @Override
     public Meal get(int id, int userId) {
         Map<Integer, Meal> meals = userMealsMap.get(userId);
-        if (meals == null) {
-            return null;
-        }
         log.info("get {}", id);
-        return meals.get(id);
+        return meals != null ? meals.get(id) : null;
     }
 
     @Override
@@ -78,11 +70,7 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     private List<Meal> filterByPredicate(Map<Integer, Meal> meals, Predicate<Meal> filter) {
-        if (meals == null) {
-            return Collections.emptyList();
-        }
-        return meals.values().stream().filter(filter).
-                sorted(Comparator.comparing(Meal::getDateTime).reversed()).collect(Collectors.toList());
+        return meals != null ? meals.values().stream().filter(filter)
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed()).collect(Collectors.toList()) : Collections.emptyList();
     }
 }
-

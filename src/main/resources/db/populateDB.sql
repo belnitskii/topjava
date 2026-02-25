@@ -14,8 +14,12 @@ VALUES ('USER', 100000),
        ('ADMIN', 100001);
 
 INSERT INTO meals (date_time, description, calories, user_id)
-VALUES (TIMESTAMP '2026-02-21 08:00:00', 'breakfast', 600, 100000),
-       (TIMESTAMP '2026-02-22 12:00:00', 'lunch', 1200, 100000),
-       (TIMESTAMP '2026-02-23 18:20:35', 'dinner', 900, 100000),
-       (TIMESTAMP '2026-02-23 12:00:00', 'coffee', 140, 100001),
-       (TIMESTAMP '2026-02-23 12:15:17', 'gyros', 1000, 100001);
+VALUES (TIMESTAMP '2026-02-21 08:00:00', 'breakfast', 500, 100000),
+       (TIMESTAMP '2026-02-21 12:00:00', 'lunch', 1000, 100000),
+       (TIMESTAMP '2026-02-21 18:00:00', 'dinner', 500, 100000),
+       (TIMESTAMP '2026-02-22 00:00:00', 'meal on borderline cases', 10, 100000),
+       (TIMESTAMP '2026-02-22 10:00:00', 'breakfast', 490, 100000),
+       (TIMESTAMP '2026-02-22 13:00:00', 'lunch', 1000, 100000),
+       (TIMESTAMP '2026-02-22 22:00:00', 'dinner', 500, 100000),
+       (TIMESTAMP '2026-02-21 08:00:00', 'breakfast', 500, 100001),
+       (TIMESTAMP '2026-02-22 12:00:00', 'lunch', 1000, 100001);

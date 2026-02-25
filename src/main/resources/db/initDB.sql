@@ -15,7 +15,7 @@ CREATE TABLE users
     enabled          BOOL                DEFAULT TRUE  NOT NULL,
     calories_per_day INTEGER             DEFAULT 2000  NOT NULL
 );
-CREATE UNIQUE INDEX users_unique_email_idx ON users (email);
+CREATE UNIQUE INDEX users_email_idx_unique ON users (email);
 
 CREATE TABLE user_role
 (
@@ -32,6 +32,6 @@ CREATE TABLE meals
     description VARCHAR   NOT NULL,
     calories    INTEGER   NOT NULL,
     user_id     INTEGER   NOT NULL,
-    CONSTRAINT user_meals_idx UNIQUE (user_id, date_time),
+    CONSTRAINT meals_user_id_date_time_idx_unique UNIQUE (user_id, date_time),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

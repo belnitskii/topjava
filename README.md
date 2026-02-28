@@ -1,3 +1,5 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/363925a4cf7844468414e95918e963b7)](https://app.codacy.com/gh/belnitskii/topjava/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 Java Enterprise Online Project
 ===============================
 

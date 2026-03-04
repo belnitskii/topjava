@@ -13,7 +13,8 @@ import java.time.LocalTime;
 @NamedQueries({
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:userId"),
         @NamedQuery(name = Meal.ALL_SORTED, query = "FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC"),
-        @NamedQuery(name = Meal.HALF_OPEN_SORTED, query = "FROM Meal m WHERE m.user.id=:userId AND m.dateTime >=:startDate AND m.dateTime <:endDate ORDER BY m.dateTime DESC"),
+        @NamedQuery(name = Meal.HALF_OPEN_SORTED, query = "FROM Meal m WHERE m.user.id=:userId " +
+                "AND m.dateTime >=:startDate AND m.dateTime <:endDate ORDER BY m.dateTime DESC"),
 })
 @Entity
 @Table(name = "meal", uniqueConstraints = @UniqueConstraint(
@@ -39,6 +40,7 @@ public class Meal extends AbstractBaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
     private User user;
 
     public Meal() {

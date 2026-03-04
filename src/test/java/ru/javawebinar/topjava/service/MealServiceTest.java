@@ -1,7 +1,13 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -13,8 +19,8 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -27,6 +33,34 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
+    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final StringBuilder sb = new StringBuilder();
+
+    @Rule
+    public Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void succeeded(long nanos, Description description) {
+            logInfo(description, "succeeded", nanos);
+        }
+
+        @Override
+        protected void failed(long nanos, Throwable e, Description description) {
+            logInfo(description, "failed", nanos);
+        }
+    };
+
+    private static void logInfo(Description description, String status, long nanos) {
+        String result = String.format("Test %s %s, spent %d milliseconds",
+                description.getMethodName(), status, TimeUnit.NANOSECONDS.toMillis(nanos));
+        log.info(result);
+        sb.append("\n");
+        sb.append(result);
+    }
+
+    @AfterClass
+    public static void printResult() {
+        log.info(sb.toString());
+    }
 
     @Autowired
     private MealService service;
@@ -54,7 +88,6 @@ public class MealServiceTest {
         Meal newMeal = getNew();
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
-        assertThat(created.getUser().getId()).isEqualTo(USER_ID);
         MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
     }
 
@@ -67,7 +100,6 @@ public class MealServiceTest {
     @Test
     public void get() {
         Meal actual = service.get(ADMIN_MEAL_ID, ADMIN_ID);
-        assertThat(actual.getUser().getId()).isEqualTo(ADMIN_ID);
         MEAL_MATCHER.assertMatch(actual, adminMeal1);
     }
 

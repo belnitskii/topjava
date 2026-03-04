@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.time.LocalDate;
 import java.time.Month;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -26,7 +26,6 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@Ignore
 public class MealServiceTest {
 
     @Autowired
@@ -55,6 +54,7 @@ public class MealServiceTest {
         Meal newMeal = getNew();
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
+        assertThat(created.getUser().getId()).isEqualTo(USER_ID);
         MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
     }
 
@@ -67,6 +67,7 @@ public class MealServiceTest {
     @Test
     public void get() {
         Meal actual = service.get(ADMIN_MEAL_ID, ADMIN_ID);
+        assertThat(actual.getUser().getId()).isEqualTo(ADMIN_ID);
         MEAL_MATCHER.assertMatch(actual, adminMeal1);
     }
 

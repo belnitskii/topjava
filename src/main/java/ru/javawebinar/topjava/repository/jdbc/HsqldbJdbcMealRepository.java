@@ -10,15 +10,15 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Repository
-@Profile(Profiles.POSTGRES_DB)
-public class JdbcPostgresMealRepository extends JdbcMealRepository<LocalDateTime> {
+@Profile(Profiles.HSQL_DB)
+public class HsqldbJdbcMealRepository extends JdbcMealRepository<Timestamp> {
 
-    public JdbcPostgresMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public HsqldbJdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
     @Override
-    protected LocalDateTime convertLocalDateTime(LocalDateTime localDateTime) {
-        return localDateTime;
+    protected Timestamp convertLocalDateTime(LocalDateTime localDateTime) {
+        return localDateTime == null ? null : Timestamp.valueOf(localDateTime);
     }
 }

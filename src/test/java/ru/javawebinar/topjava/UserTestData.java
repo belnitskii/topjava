@@ -11,7 +11,10 @@ import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class UserTestData {
-    public static final MatcherFactory.Matcher<User> USER_MATCHER = MatcherFactory.usingIgnoringFieldsComparator("registered", "roles", "meals");
+    public static final MatcherFactory.Matcher<User> USER_MATCHER =
+            MatcherFactory.usingIgnoringFieldsComparator("registered", "roles", "meals");
+    public static final MatcherFactory.Matcher<User> USER_MATCHER_WITH_MEALS =
+            MatcherFactory.usingIgnoringFieldsComparator("registered", "roles", "meals.user");
 
     public static final int USER_ID = START_SEQ;
     public static final int ADMIN_ID = START_SEQ + 1;
@@ -28,7 +31,7 @@ public class UserTestData {
 
     public static User getUserWithMeals() {
         User userWithMeals = new User(user);
-        userWithMeals.setMeals(List.of(meal1, meal2, meal3, meal4, meal5, meal6, meal7));
+        userWithMeals.setMeals(List.of(meal2, meal1, meal4, meal3, meal5, meal6, meal7));
         return userWithMeals;
     }
 

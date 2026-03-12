@@ -11,6 +11,8 @@ import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
     public static final MatcherFactory.Matcher<Meal> MEAL_MATCHER = MatcherFactory.usingIgnoringFieldsComparator("user");
+    public static final MatcherFactory.Matcher<Meal> MEAL_MATCHER_WITH_USER =
+            MatcherFactory.usingIgnoringFieldsComparator("user.meals", "user.registered");
 
     public static final int NOT_FOUND = 10;
     public static final int MEAL1_ID = START_SEQ + 3;
@@ -34,5 +36,15 @@ public class MealTestData {
 
     public static Meal getUpdated() {
         return new Meal(MEAL1_ID, meal1.getDateTime().plus(2, ChronoUnit.MINUTES), "Обновленный завтрак", 200);
+    }
+
+    public static Meal getMealWithUser() {
+        Meal mealWithUser = new Meal();
+        mealWithUser.setId(adminMeal1.getId());
+        mealWithUser.setCalories(adminMeal1.getCalories());
+        mealWithUser.setDescription(adminMeal1.getDescription());
+        mealWithUser.setDateTime(adminMeal1.getDateTime());
+        mealWithUser.setUser(UserTestData.admin);
+        return mealWithUser;
     }
 }

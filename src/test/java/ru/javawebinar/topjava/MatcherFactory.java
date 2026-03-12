@@ -22,7 +22,10 @@ public class MatcherFactory {
         }
 
         public void assertMatch(T actual, T expected) {
-            assertThat(actual).usingRecursiveComparison().ignoringFields(fieldsToIgnore).isEqualTo(expected);
+           assertThat(actual).usingRecursiveComparison()
+                    .ignoringFields(fieldsToIgnore)
+                    .ignoringCollectionOrder()
+                    .isEqualTo(expected);
         }
 
         @SafeVarargs

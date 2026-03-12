@@ -1,7 +1,5 @@
 package ru.javawebinar.topjava.service;
 
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -24,39 +22,33 @@ public class MealService {
         this.repository = repository;
     }
 
-    @CacheEvict(value = "meals", allEntries = true)
     public Meal get(int id, int userId) {
         return checkNotFound(repository.get(id, userId), id);
     }
 
-    @CacheEvict(value = "meals", allEntries = true)
     public void delete(int id, int userId) {
         checkNotFound(repository.delete(id, userId), id);
     }
 
-    @CacheEvict(value = "meals", allEntries = true)
     public List<Meal> getBetweenInclusive(@Nullable LocalDate startDate, @Nullable LocalDate endDate, int userId) {
         return repository.getBetweenHalfOpen(atStartOfDayOrMin(startDate), atStartOfNextDayOrMax(endDate), userId);
     }
 
-    @Cacheable("meals")
     public List<Meal> getAll(int userId) {
         return repository.getAll(userId);
     }
 
-    @CacheEvict(value = "meals", allEntries = true)
     public void update(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
         checkNotFound(repository.save(meal, userId), meal.id());
     }
 
-    @CacheEvict(value = "meals", allEntries = true)
     public Meal create(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
         return repository.save(meal, userId);
     }
 
     public Meal getWithUser(int id, int userId) {
-        return repository.getWithUser(id, userId);
+        return checkNotFound(repository.getWithUser(id, userId), id);
     }
 }

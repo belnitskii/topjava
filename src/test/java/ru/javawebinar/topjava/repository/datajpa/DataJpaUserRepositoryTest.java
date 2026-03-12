@@ -8,10 +8,12 @@ import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.service.UserServiceTest;
+import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
-import static ru.javawebinar.topjava.UserTestData.USER_ID;
-import static ru.javawebinar.topjava.UserTestData.USER_MATCHER;
+import java.util.Collections;
+
+import static org.junit.Assert.assertThrows;
+import static ru.javawebinar.topjava.UserTestData.*;
 
 @ActiveProfiles(profiles = Profiles.DATAJPA)
 public class DataJpaUserRepositoryTest extends UserServiceTest {
@@ -21,7 +23,19 @@ public class DataJpaUserRepositoryTest extends UserServiceTest {
     @Test
     public void getWithMeals() {
         User user = service.getWithMeals(USER_ID);
-        USER_MATCHER.assertMatch(user, UserTestData.getUserWithMeals());
-        MEAL_MATCHER.assertMatch(user.getMeals(), UserTestData.getUserWithMeals().getMeals());
+        USER_MATCHER_WITH_MEALS.assertMatch(user, UserTestData.getUserWithMeals());
+    }
+
+    @Test
+    public void getWithOutMeals() {
+        User user = service.getWithMeals(GUEST_ID);
+        User guestCopy = new User(guest);
+        guestCopy.setMeals(Collections.emptyList());
+        USER_MATCHER_WITH_MEALS.assertMatch(user, guestCopy);
+    }
+
+    @Test
+    public void getNotFound() {
+        assertThrows(NotFoundException.class, () -> service.getWithMeals(NOT_FOUND));
     }
 }

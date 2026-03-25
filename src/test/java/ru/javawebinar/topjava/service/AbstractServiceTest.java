@@ -17,8 +17,8 @@ import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.TimingRules;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static ru.javawebinar.topjava.Profiles.DATAJPA;
-import static ru.javawebinar.topjava.Profiles.JPA;
+import static org.junit.Assume.assumeFalse;
+import static ru.javawebinar.topjava.Profiles.JDBC;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
@@ -45,7 +45,7 @@ public abstract class AbstractServiceTest {
                 .withRootCauseInstanceOf(rootExceptionClass);
     }
 
-    protected boolean checkActiveProfile() {
-        return environment.acceptsProfiles(Profiles.of(DATAJPA, JPA));
+    protected void skipTestForProfile(String profile) {
+        assumeFalse(environment.acceptsProfiles(Profiles.of(profile)));
     }
 }
